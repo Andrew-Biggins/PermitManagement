@@ -1,22 +1,12 @@
 ﻿using PermitManagement.Core.Entities;
 using PermitManagement.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PermitManagement.Core.Services;
-public class PermitService : IPermitService
-{
-    private readonly IPermitRepository _repo;
-    private readonly IDateTimeProvider _clock;
 
-    public PermitService(IPermitRepository repo, IDateTimeProvider clock)
-    {
-        _repo = repo;
-        _clock = clock;
-    }
+public class PermitService(IPermitRepository repo, IDateTimeProvider clock) : IPermitService
+{
+    private readonly IPermitRepository _repo = repo;
+    private readonly IDateTimeProvider _clock = clock;
 
     public async Task AddPermitAsync(Permit permit)
     {

@@ -1,25 +1,38 @@
+using Microsoft.EntityFrameworkCore;
+using PermitManagement.Api;
+using PermitManagement.Core.Interfaces;
+using PermitManagement.Core.Services;
+using PermitManagement.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<PermitDbContext>(
+    o => o.UseSqlite("Data Source=permit.db"));
+
+builder.Services.AddScoped<IPermitRepository, PermitRepository>();
+builder.Services.AddScoped<IPermitService, PermitService>();
+builder.Services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<PermitDbContext>();
+    context.Database.EnsureCreated();
+    SeedData.Initialize(context);
+}
+
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
-app.MapControllers();
+PermitEndpoints.Map(app);  
 
 app.Run();

@@ -37,8 +37,7 @@ public class PermitServiceTests
         Assert.True(result);
     }
 
-    [Gwt(
-    "Given a new permit with a valid date range",
+    [Gwt("Given a new permit with a valid date range",
     "when adding it via the permit service",
     "then the repository AddAsync method is called once")]
     public async Task T1()
