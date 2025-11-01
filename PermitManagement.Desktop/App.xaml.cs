@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PermitManagement.Presentation;
+using PermitManagement.Presentation.Interfaces;
 using System.Net.Http;
 using System.Windows;
 
@@ -18,7 +19,7 @@ public partial class App : Application
             BaseAddress = new Uri("https://localhost:7158")
         });
 
-        services.AddSingleton<PermitApiClient>();
+        services.AddSingleton<IPermitApiClient, PermitApiClient>();
         services.AddSingleton<PermitViewModel>();
 
         _services = services.BuildServiceProvider();
