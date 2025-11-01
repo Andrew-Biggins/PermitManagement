@@ -19,6 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PermitManagement.Core\PermitManagement.Core.csproj" />
+    <ProjectReference Include="..\PermitManagement.Infrastructure\PermitManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\PermitManagement.Testing.Shared\PermitManagement.Testing.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

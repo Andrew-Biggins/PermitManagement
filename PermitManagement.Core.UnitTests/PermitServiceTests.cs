@@ -3,6 +3,7 @@ using PermitManagement.Core.Entities;
 using PermitManagement.Core.Interfaces;
 using PermitManagement.Core.Services;
 using PermitManagement.Testing.Shared;
+using static PermitManagement.Testing.Shared.TestFixtures;
 
 namespace PermitManagement.Core.UnitTests;
 
@@ -12,9 +13,6 @@ public class PermitServiceTests
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly PermitService _service;
     private readonly DateTime _fixedNow = new(2025, 10, 15);
-    private readonly Vehicle _testVehicle = new("TEST123");
-    private readonly Zone _testZoneA = new("A");
-    private readonly Zone _testZoneB = new("B");
 
     public PermitServiceTests() => _service = new PermitService(_repo, _clock);
 
@@ -25,11 +23,11 @@ public class PermitServiceTests
     {
         // Arrange
         _clock.UtcNow.Returns(_fixedNow);
-        var permit = new Permit(_testVehicle, _testZoneA, _fixedNow.AddDays(-1), _fixedNow.AddDays(2));
-        _repo.GetPermitsForVehicleAsync(_testVehicle).Returns([permit]);
+        var permit = new Permit(VehicleABC123, ZoneA, _fixedNow.AddDays(-1), _fixedNow.AddDays(2));
+        _repo.GetPermitsForVehicleAsync(VehicleABC123).Returns([permit]);
 
         // Act
-        var result = await _service.HasValidPermitAsync(_testVehicle,_testZoneA);
+        var result = await _service.HasValidPermitAsync(VehicleABC123, ZoneA);
 
         // Assert
         Assert.True(result);
@@ -41,7 +39,7 @@ public class PermitServiceTests
     public async Task T1()
     {
         // Arrange
-        var permit = new Permit(_testVehicle, _testZoneA, _fixedNow, _fixedNow.AddDays(1));
+        var permit = new Permit(VehicleABC123, ZoneA, _fixedNow, _fixedNow.AddDays(1));
 
         // Act
         await _service.AddPermitAsync(permit);
@@ -56,7 +54,7 @@ public class PermitServiceTests
     public async Task T2()
     {
         // Arrange
-        var permit = new Permit(_testVehicle, _testZoneA, _fixedNow.AddDays(1), _fixedNow);
+        var permit = new Permit(VehicleABC123, ZoneA, _fixedNow.AddDays(1), _fixedNow);
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _service.AddPermitAsync(permit));
@@ -69,11 +67,11 @@ public class PermitServiceTests
     {
         // Arrange
         _clock.UtcNow.Returns(_fixedNow);
-        var permit = new Permit(_testVehicle, _testZoneA, _fixedNow, _fixedNow.AddDays(1));
+        var permit = new Permit(VehicleABC123, ZoneA, _fixedNow, _fixedNow.AddDays(1));
         _repo.GetPermitsForVehicleAsync(Arg.Any<Vehicle>()).Returns([permit]);
 
         // Act
-        var result = await _service.HasValidPermitAsync(_testVehicle, _testZoneA);
+        var result = await _service.HasValidPermitAsync(VehicleABC123, ZoneA);
 
         // Assert
         Assert.True(result);
@@ -86,11 +84,11 @@ public class PermitServiceTests
     {
         // Arrange
         _clock.UtcNow.Returns(_fixedNow);
-        var permit = new Permit(_testVehicle, _testZoneA, _fixedNow.AddDays(-1), _fixedNow.AddDays(5));
+        var permit = new Permit(VehicleABC123, ZoneA, _fixedNow.AddDays(-1), _fixedNow.AddDays(5));
         _repo.GetPermitsForVehicleAsync(Arg.Any<Vehicle>()).Returns([permit]);
 
         // Act
-        var result = await _service.HasValidPermitAsync(_testVehicle, _testZoneB);
+        var result = await _service.HasValidPermitAsync(VehicleABC123, ZoneB);
 
         // Assert
         Assert.False(result);
@@ -106,7 +104,7 @@ public class PermitServiceTests
         _repo.GetPermitsForVehicleAsync(Arg.Any<Vehicle>()).Returns([]);
 
         // Act
-        var result = await _service.HasValidPermitAsync(_testVehicle, _testZoneA);
+        var result = await _service.HasValidPermitAsync(VehicleABC123, ZoneA);
 
         // Assert
         Assert.False(result);
@@ -120,18 +118,18 @@ public class PermitServiceTests
         // Arrange
         _clock.UtcNow.Returns(_fixedNow);
 
-        var active = new Permit(_testVehicle, _testZoneA,
+        var active = new Permit(VehicleABC123, ZoneA,
             _fixedNow.AddDays(-1), _fixedNow.AddDays(5));
         
-        var expired = new Permit(_testVehicle, _testZoneA,
+        var expired = new Permit(VehicleABC123, ZoneA,
             _fixedNow.AddDays(-10), _fixedNow.AddDays(-5));
 
-        _repo.GetPermitsByZoneAsync(_testZoneA).Returns([active, expired]);
+        _repo.GetPermitsByZoneAsync(ZoneA).Returns([active, expired]);
 
         // Act
-        var result = await _service.GetActivePermitsAsync(_testZoneA);
+        var result = await _service.GetActivePermitsAsync(ZoneA);
 
         // Assert
-        Assert.Collection(result, r => Assert.Equal(_testVehicle, _testVehicle));
+        Assert.Collection(result, r => Assert.Equal(r.Vehicle, VehicleABC123));
     }
 }
