@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PermitManagement.Core.Entities;
 using PermitManagement.Core.Interfaces;
-using PermitManagement.Infrastructure;
 
-namespace PermitManagement.Api;
+namespace PermitManagement.Infrastructure;
 
 public class PermitRepository(PermitDbContext context) : IPermitRepository
 {

@@ -16,10 +16,7 @@ public class Permit
         EndDate = endDate;
     }
 
-    public bool IsActive(DateTime date)
-    {
-        return date >= StartDate && date <= EndDate;
-    }
+    public bool IsActive(DateTime date) => date >= StartDate && date <= EndDate;
 
     // For EF Core only
     private Permit() { }

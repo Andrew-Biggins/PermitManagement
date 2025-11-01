@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Console",
+    "Projects": [
+      {
+        "Path": "PermitManagement.Api\\PermitManagement.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "PermitManagement.Console\\PermitManagement.Console.csproj",
+        "Action": "Start",
+        "DebugTarget": "PermitManagement.Console"
+      }
+    ]
+  }
+]

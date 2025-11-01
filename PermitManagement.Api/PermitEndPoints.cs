@@ -13,8 +13,12 @@ public static class PermitEndpoints
             return Results.Created($"/permits/{permit.Id}", permit);
         });
 
-        app.MapGet("/permits/active", async (IPermitService service) =>
-            Results.Ok(await service.GetActivePermitsAsync(new Zone("ZoneA"))));
+        app.MapGet("/permits/active", async (string zone, DateTime? date, IPermitService service) =>
+        {
+            var result = await service.GetActivePermitsAsync(new Zone(zone), date);
+            return Results.Ok(result);
+        })
+        .WithDescription("Gets all active permits in a zone. Optional 'date' parameter checks activity for a specific date.");
 
         app.MapGet("/permits/check", async (string registration, string zone, IPermitService service) =>
         {

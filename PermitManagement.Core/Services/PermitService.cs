@@ -31,4 +31,3 @@ public class PermitService(IPermitRepository repo, IDateTimeProvider clock) : IP
         return permits.Where(p => p.IsActive(now));
     }
 }
-
