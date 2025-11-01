@@ -13,5 +13,20 @@
         "DebugTarget": "PermitManagement.Console"
       }
     ]
+  },
+  {
+    "Name": "WPF",
+    "Projects": [
+      {
+        "Path": "PermitManagement.Api\\PermitManagement.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "PermitManagement.Desktop\\PermitManagement.Desktop.csproj",
+        "Action": "Start",
+        "DebugTarget": "PermitManagement.Desktop"
+      }
+    ]
   }
 ]

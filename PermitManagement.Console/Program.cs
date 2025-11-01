@@ -1,8 +1,7 @@
-﻿using PermitManagement.Console;
-using PermitManagement.Core.Entities;
+﻿using PermitManagement.Core.Entities;
+using PermitManagement.Presentation;
 using System.Globalization;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+using static PermitManagement.Presentation.Shared;
 
 using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7158") };
 var api = new PermitApiClient(http);
@@ -26,14 +25,6 @@ while (true)
             var end = ReadDate("End date");
 
             var permit = new Permit(vehicle, zone, start, end);
-            //// Serialize manually
-            //var json = JsonSerializer.Serialize(permit, new JsonSerializerOptions
-            //{
-            //    WriteIndented = true,
-            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            //});
-
-           // Console.WriteLine("Posting JSON:\n" + json);
             await api.AddPermitAsync(permit);
             Console.WriteLine("Permit added successfully.");
             break;
@@ -62,12 +53,13 @@ static DateTime ReadDate(string prompt)
 {
     while (true)
     {
-        Console.Write($"{prompt} (yyyy-MM-dd): ");
+        const string dateFormat = "yyyy-MM-dd";
+        Console.Write($"{prompt} ({dateFormat}): ");
         var input = Console.ReadLine();
 
         if (DateTime.TryParseExact(
                 input,
-                "yyyy-MM-dd",
+                dateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out var date))
@@ -76,7 +68,7 @@ static DateTime ReadDate(string prompt)
         }
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Invalid date format. Please use yyyy-MM-dd.");
+        Console.WriteLine($"Invalid date format. Please use ({dateFormat}).");
         Console.ResetColor();
     }
 }
@@ -99,19 +91,16 @@ static Zone ReadZone()
 
 static Vehicle ReadVehicle()
 {
-    var pattern = @"^[A-Z]{1,3}\d{1,3}[A-Z]{0,3}$"; // loose UK-style check
-    var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-
     while (true)
     {
         Console.Write("Vehicle registration: ");
         var input = Console.ReadLine()?.Trim().ToUpperInvariant();
 
-        if (!string.IsNullOrEmpty(input) && regex.IsMatch(input))
+        if (!string.IsNullOrEmpty(input) && RegPattern.IsMatch(input))
             return new Vehicle(input);
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Invalid registration. Example formats: AB12CDE, A123BC.");
+        Console.WriteLine(InvalidRegistrationMessage);
         Console.ResetColor();
     }
 }

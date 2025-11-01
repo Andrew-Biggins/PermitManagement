@@ -3,10 +3,107 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PermitManagement.Desktop"
+        xmlns:presentation="clr-namespace:PermitManagement.Presentation;assembly=PermitManagement.Presentation"
+        d:DataContext="{d:DesignInstance {x:Type presentation:PermitViewModel}}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Permit Management"
+        Width="800"
+        Height="600"
+        Background="#f8f9fa">
 
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top panel: filters and controls -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" >
+            <TextBlock Text="Zone:" VerticalAlignment="Center" FontWeight="Bold" Margin="5,0"/>
+            <ComboBox Width="80"
+                        Margin="5,0"
+                      SelectedItem="{Binding SelectedZone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBox.ItemsSource>
+                    <x:Array Type="{x:Type sys:String}" 
+                             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                        <sys:String>A</sys:String>
+                        <sys:String>B</sys:String>
+                        <sys:String>C</sys:String>
+                        <sys:String>D</sys:String>
+                        <sys:String>E</sys:String>
+                        <sys:String>F</sys:String>
+                        <sys:String>G</sys:String>
+                        <sys:String>H</sys:String>
+                        <sys:String>I</sys:String>
+                        <sys:String>J</sys:String>
+                        <sys:String>K</sys:String>
+                    </x:Array>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+
+            <!-- Vehicle registration -->
+            <TextBlock Text="Vehicle:" VerticalAlignment="Center" FontWeight="Bold"/>
+            <TextBox Width="100"
+                     Margin="5,0"
+                     Text="{Binding VehicleRegistration, 
+                                    Mode=TwoWay, 
+                                    UpdateSourceTrigger=PropertyChanged, 
+                                    ValidatesOnDataErrors=True}"
+                     ToolTip="{Binding (Validation.Errors)[0].ErrorContent, 
+                                       RelativeSource={RelativeSource Self}}"/>
+
+
+            <!-- Start date -->
+            <TextBlock Text="Start Date:" VerticalAlignment="Center" FontWeight="Bold"/>
+            <DatePicker Width="130"
+                        Margin="5,0"
+                        SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Duration selection -->
+            <TextBlock Text="Duration:" VerticalAlignment="Center" FontWeight="Bold"/>
+            <ComboBox Width="110"
+                      Margin="5,0"
+                      SelectedItem="{Binding SelectedDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBox.ItemsSource>
+                    <x:Array Type="{x:Type sys:String}" 
+                             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                        <sys:String>1 Day</sys:String>
+                        <sys:String>1 Week</sys:String>
+                        <sys:String>1 Month</sys:String>
+                        <sys:String>1 Year</sys:String>
+                    </x:Array>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10" >
+
+            <Button Content="Load Active Permits"
+                    Padding="10,5"
+                    Command="{Binding LoadPermitsCommand}" />
+
+            <Button Content="Add Permit"
+                    Padding="10,5"
+                    Margin="10,0,0,0"
+                    Command="{Binding AddPermitCommand}" />
+        </StackPanel>
+
+        <!-- Data grid of permits -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Permits}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  AlternatingRowBackground="#eef"
+                  HeadersVisibility="Column"
+                  BorderBrush="#ccc"
+                  BorderThickness="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Vehicle" Binding="{Binding Vehicle.Registration}" Width="*"/>
+                <DataGridTextColumn Header="Zone" Binding="{Binding Zone.Name}" Width="80"/>
+                <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=d}" Width="120"/>
+                <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=d}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

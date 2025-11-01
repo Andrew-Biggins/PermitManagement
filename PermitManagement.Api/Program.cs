@@ -48,6 +48,11 @@ public static class Program
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<PermitDbContext>();
+
+#if DEBUG
+            context.Database.EnsureDeleted(); // Only in dev
+#endif
+
             context.Database.EnsureCreated();
             SeedData.Initialize(context);
         }

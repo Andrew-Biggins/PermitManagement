@@ -1,10 +1,11 @@
 ﻿using PermitManagement.Core.Entities;
+using PermitManagement.Presentation.Interfaces;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace PermitManagement.Console;
+namespace PermitManagement.Presentation;
 
-public class PermitApiClient(HttpClient http)
+public class PermitApiClient(HttpClient http) : IPermitApiClient
 {
     private readonly HttpClient _http = http;
 
