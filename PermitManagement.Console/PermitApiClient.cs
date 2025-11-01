@@ -1,4 +1,5 @@
 ﻿using PermitManagement.Core.Entities;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace PermitManagement.Console;
@@ -9,6 +10,7 @@ public class PermitApiClient(HttpClient http)
 
     public async Task AddPermitAsync(Permit permit)
     {
+        _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         var response = await _http.PostAsJsonAsync("/permits", permit);
         response.EnsureSuccessStatusCode();
     }

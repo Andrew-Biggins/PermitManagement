@@ -1,4 +1,6 @@
 ﻿using PermitManagement.Core.Entities;
+using PermitManagement.Testing.Shared;
+using static PermitManagement.Testing.Shared.TestFixtures;
 
 namespace PermitManagement.Core.UnitTests;
 public class PermitTests
@@ -9,14 +11,10 @@ public class PermitTests
     public void T0()
     {
         // Arrange
-        var permit = new Permit(
-            new Vehicle("ABC123"),
-            new Zone("ZoneA"),
-            new DateTime(2025, 10, 1),
-            new DateTime(2025, 10, 31));
+        var permit = new Permit(VehicleABC123, ZoneA, DefaultStart, DefaultEnd);
 
         // Act
-        var result = permit.IsActive(new DateTime(2025, 10, 15));
+        var result = permit.IsActive(DefaultStart.AddDays(1));
 
         // Assert
         Assert.True(result);
@@ -25,22 +23,15 @@ public class PermitTests
     [GwtTheory("Given a permit with a fixed start and end date",
         "when checking if the permit is active for dates outside that range",
         "then IsActive returns false")]
-    [InlineData("2025-09-30")]  // before start
-    [InlineData("2025-11-01")]  // after end
-    public void IsActive_ShouldReturnFalse_WhenDateOutsideRange(string testDate)
+    [InlineData(-1)]                             // before start
+    [InlineData(DefaultPermitDurationDays + 1)]  // after end
+    public void T1(int elapsedDays)
     {
         // Arrange
-        var permit = new Permit(
-            new Vehicle("ABC123"),
-            new Zone("ZoneA"),
-            new DateTime(2025, 10, 1),
-            new DateTime(2025, 10, 31)
-        );
-
-        var date = DateTime.Parse(testDate);
+        var permit = new Permit(VehicleABC123, ZoneA, DefaultStart, DefaultEnd);
 
         // Act
-        var result = permit.IsActive(date);
+        var result = permit.IsActive(DefaultStart.AddDays(elapsedDays));
 
         // Assert
         Assert.False(result);

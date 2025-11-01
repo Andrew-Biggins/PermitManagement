@@ -2,11 +2,13 @@
 
 public class Permit
 {
-    public int Id { get; private set; }
-    public Vehicle Vehicle { get; private set; }
-    public Zone Zone { get; private set; }
-    public DateTime StartDate { get; private set; }
-    public DateTime EndDate { get; private set; }
+    public int Id { get; set; }
+    public Vehicle Vehicle { get; set; } = new();
+    public Zone Zone { get; set; } = new();
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+
+    public Permit() { }
 
     public Permit(Vehicle vehicle, Zone zone, DateTime startDate, DateTime endDate)
     {
@@ -17,7 +19,4 @@ public class Permit
     }
 
     public bool IsActive(DateTime date) => date >= StartDate && date <= EndDate;
-
-    // For EF Core only
-    private Permit() { }
 }

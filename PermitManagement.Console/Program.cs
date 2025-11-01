@@ -1,6 +1,7 @@
 ﻿using PermitManagement.Console;
 using PermitManagement.Core.Entities;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7158") };
@@ -25,6 +26,14 @@ while (true)
             var end = ReadDate("End date");
 
             var permit = new Permit(vehicle, zone, start, end);
+            //// Serialize manually
+            //var json = JsonSerializer.Serialize(permit, new JsonSerializerOptions
+            //{
+            //    WriteIndented = true,
+            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            //});
+
+           // Console.WriteLine("Posting JSON:\n" + json);
             await api.AddPermitAsync(permit);
             Console.WriteLine("Permit added successfully.");
             break;
@@ -80,7 +89,7 @@ static Zone ReadZone()
         var input = Console.ReadLine()?.Trim().ToUpperInvariant();
 
         if (!string.IsNullOrEmpty(input) && input.Length == 1 && input[0] is >= 'A' and <= 'K')
-            return new Zone($"Zone{input}");
+            return new Zone(input);
 
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Invalid zone. Enter a single letter from A to K.");

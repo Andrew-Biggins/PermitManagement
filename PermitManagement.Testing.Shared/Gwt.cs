@@ -1,4 +1,4 @@
-﻿namespace PermitManagement.Core.UnitTests;
+﻿namespace PermitManagement.Testing.Shared;
 
 internal sealed class Gwt : FactAttribute
 {

@@ -1,4 +1,5 @@
-﻿using PermitManagement.Core.Entities;
+﻿using FluentValidation;
+using PermitManagement.Core.Entities;
 using PermitManagement.Core.Interfaces;
 
 namespace PermitManagement.Api;
@@ -7,8 +8,12 @@ public static class PermitEndpoints
 {
     public static void Map(WebApplication app)
     {
-        app.MapPost("/permits", async (Permit permit, IPermitService service) =>
+        app.MapPost("/permits", async (Permit permit, IValidator<Permit> validator, IPermitService service) =>
         {
+            var result = await validator.ValidateAsync(permit);
+            if (!result.IsValid)
+                return Results.BadRequest(result.Errors.Select(e => e.ErrorMessage));
+
             await service.AddPermitAsync(permit);
             return Results.Created($"/permits/{permit.Id}", permit);
         });

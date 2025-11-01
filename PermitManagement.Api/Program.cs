@@ -1,38 +1,60 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using PermitManagement.Api;
 using PermitManagement.Core.Interfaces;
 using PermitManagement.Core.Services;
 using PermitManagement.Infrastructure;
+using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace PermitManagement.Api;
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<PermitDbContext>(
-    o => o.UseSqlite("Data Source=permit.db"));
-
-builder.Services.AddScoped<IPermitRepository, PermitRepository>();
-builder.Services.AddScoped<IPermitService, PermitService>();
-builder.Services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+public static class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureServices(builder.Services);
+        var app = ConfigureApp(builder);
+        app.Run();
+    }
+
+    public static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+
+        services.AddDbContext<PermitDbContext>(
+            o => o.UseSqlite("Data Source=permit.db"));
+
+        services.AddScoped<IPermitRepository, PermitRepository>();
+        services.AddScoped<IPermitService, PermitService>();
+        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+        services.AddValidatorsFromAssemblyContaining<PermitValidator>();
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        });
+    }
+
+    public static WebApplication ConfigureApp(WebApplicationBuilder builder)
+    {
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<PermitDbContext>();
+            context.Database.EnsureCreated();
+            SeedData.Initialize(context);
+        }
+
+        app.UseHttpsRedirection();
+        PermitEndpoints.Map(app);
+
+        return app;
+    }
 }
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<PermitDbContext>();
-    context.Database.EnsureCreated();
-    SeedData.Initialize(context);
-}
-
-app.UseHttpsRedirection();
-
-PermitEndpoints.Map(app);  
-
-app.Run();

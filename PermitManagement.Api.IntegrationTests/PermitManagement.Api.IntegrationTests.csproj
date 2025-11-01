@@ -11,14 +11,15 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.10" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PermitManagement.Core\PermitManagement.Core.csproj" />
+    <ProjectReference Include="..\PermitManagement.Api\PermitManagement.Api.csproj" />
     <ProjectReference Include="..\PermitManagement.Testing.Shared\PermitManagement.Testing.Shared.csproj" />
   </ItemGroup>
 

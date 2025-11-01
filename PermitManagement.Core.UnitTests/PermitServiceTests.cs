@@ -2,6 +2,7 @@ using NSubstitute;
 using PermitManagement.Core.Entities;
 using PermitManagement.Core.Interfaces;
 using PermitManagement.Core.Services;
+using PermitManagement.Testing.Shared;
 
 namespace PermitManagement.Core.UnitTests;
 
@@ -12,13 +13,10 @@ public class PermitServiceTests
     private readonly PermitService _service;
     private readonly DateTime _fixedNow = new(2025, 10, 15);
     private readonly Vehicle _testVehicle = new("TEST123");
-    private readonly Zone _testZoneA = new("ZoneA");
-    private readonly Zone _testZoneB = new("ZoneB");
+    private readonly Zone _testZoneA = new("A");
+    private readonly Zone _testZoneB = new("B");
 
-    public PermitServiceTests()
-    {
-        _service = new PermitService(_repo, _clock);
-    }
+    public PermitServiceTests() => _service = new PermitService(_repo, _clock);
 
     [Gwt("Given a vehicle with an active permit in the same zone",
         "when checking if that vehicle has a valid permit",
@@ -128,10 +126,10 @@ public class PermitServiceTests
         var expired = new Permit(_testVehicle, _testZoneA,
             _fixedNow.AddDays(-10), _fixedNow.AddDays(-5));
 
-        _repo.GetPermitsByZoneAsync(new Zone("ZoneA")).Returns([active, expired]);
+        _repo.GetPermitsByZoneAsync(_testZoneA).Returns([active, expired]);
 
         // Act
-        var result = await _service.GetActivePermitsAsync(new Zone("ZoneA"));
+        var result = await _service.GetActivePermitsAsync(_testZoneA);
 
         // Assert
         Assert.Collection(result, r => Assert.Equal(_testVehicle, _testVehicle));
