@@ -28,5 +28,20 @@
         "DebugTarget": "PermitManagement.Desktop"
       }
     ]
+  },
+  {
+    "Name": "MAUI",
+    "Projects": [
+      {
+        "Path": "PermitManagement.Api\\PermitManagement.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "PermitManagement.Maui\\PermitManagement.Maui.csproj",
+        "Action": "Start",
+        "DebugTarget": "Windows Machine"
+      }
+    ]
   }
 ]
