@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:PermitManagement.Core.Entities;assembly=PermitManagement.Core"
+             x:Class="PermitManagement.Maui.MainPage"
+             Title="Permit Management">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Grid ColumnDefinitions="Auto,400"
+                  RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="12"
+                  RowSpacing="12">
+                <Label Text="Zone"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <Picker x:Name="ZonePicker"
+                        Grid.Column="1"
+                        SelectedItem="{Binding SelectedZone, Mode=TwoWay}" />
+
+                <Label Grid.Row="1"
+                       Text="Vehicle"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <Entry Grid.Row="1"
+                       Grid.Column="1"
+                       Text="{Binding VehicleRegistration, Mode=TwoWay}"
+                       ClearButtonVisibility="WhileEditing"
+                       Keyboard="Chat" />
+
+                <HorizontalStackLayout Spacing="12"
+                                       Grid.Row="2">
+                    <Label Text="Valid permit"
+                           TextColor="Green"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding HasValidPermit}" />
+                    <Label Text="No valid permit"
+                           TextColor="Red"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding NoValidPermit}" />      
+                </HorizontalStackLayout>
+
+                <Label Grid.Row="3"
+                       Text="Start"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <DatePicker Grid.Row="3"
+                            Grid.Column="1"
+                            Date="{Binding StartDate, Mode=TwoWay}" />
+
+                <Label Grid.Row="4"
+                       Text="Duration"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <Picker x:Name="DurationPicker"
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        SelectedItem="{Binding SelectedDuration, Mode=TwoWay}" />
+            </Grid>
+
+            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                <Label Text="Show all permits"
+                       VerticalOptions="Center" />
+                <Switch IsToggled="{Binding ShowAllPermits, Mode=TwoWay}"
+                        VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="12">
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="Green"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding StatusMessage}"
+                                     Value="">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding StatusMessage}"
+                                     Value="{x:Null}">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+
+                <Button Grid.Column="1"
+                        Text="Add Permit"
+                        Command="{Binding AddPermitCommand}" />
+            </Grid>
+
+            <CollectionView ItemsSource="{Binding Permits}">
+                <CollectionView.Header>
+                    <Grid ColumnDefinitions="100,140,120,100"
+                          Padding="0,0,0,4">
+                        <Label Text="Vehicle" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="Zone" FontAttributes="Bold" />
+                        <Label Grid.Column="2" Text="Start" FontAttributes="Bold" />
+                        <Label Grid.Column="3" Text="End" FontAttributes="Bold" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="core:Permit">
+                        <Grid ColumnDefinitions="100,100,100,100"
+                              ColumnSpacing="12"
+                              Padding="0,4">
+                            <Label Text="{Binding Vehicle.Registration}" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding Zone.Name}" />
+                            <Label Grid.Column="2"
+                                   Text="{Binding StartDate, StringFormat='{0:d}'}" />
+                            <Label Grid.Column="3"
+                                   Text="{Binding EndDate, StringFormat='{0:d}'}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
