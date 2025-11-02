@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PermitManagement.Core\PermitManagement.Core.csproj" />
     <ProjectReference Include="..\PermitManagement.Infrastructure\PermitManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\PermitManagement.Shared\PermitManagement.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,11 +16,15 @@ public class PermitApiClient(HttpClient http) : IPermitApiClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task<IEnumerable<Permit>> GetActivePermitsAsync(string zone, DateTime? date = null)
+    public async Task<IEnumerable<Permit>> GetActivePermitsAsync(string? zone = null, DateTime? date = null)
     {
-        var query = $"/permits/active?zone={zone}";
+        var query = string.IsNullOrWhiteSpace(zone)
+            ? "/permits/active"
+            : $"/permits/active?zone={zone}";
+
         if (date.HasValue)
             query += $"&date={date.Value:yyyy-MM-dd}";
+
         return await _http.GetFromJsonAsync<IEnumerable<Permit>>(query) ?? [];
     }
 

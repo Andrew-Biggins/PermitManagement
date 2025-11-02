@@ -4,12 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:presentation="clr-namespace:PermitManagement.Presentation;assembly=PermitManagement.Presentation"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         d:DataContext="{d:DesignInstance {x:Type presentation:PermitViewModel}}"
         mc:Ignorable="d"
         Title="Permit Management"
-        Width="800"
+        Width="710"
         Height="600"
         Background="#f8f9fa">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -22,25 +27,9 @@
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10" >
             <TextBlock Text="Zone:" VerticalAlignment="Center" FontWeight="Bold" Margin="5,0"/>
             <ComboBox Width="80"
-                        Margin="5,0"
-                      SelectedItem="{Binding SelectedZone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <ComboBox.ItemsSource>
-                    <x:Array Type="{x:Type sys:String}" 
-                             xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                        <sys:String>A</sys:String>
-                        <sys:String>B</sys:String>
-                        <sys:String>C</sys:String>
-                        <sys:String>D</sys:String>
-                        <sys:String>E</sys:String>
-                        <sys:String>F</sys:String>
-                        <sys:String>G</sys:String>
-                        <sys:String>H</sys:String>
-                        <sys:String>I</sys:String>
-                        <sys:String>J</sys:String>
-                        <sys:String>K</sys:String>
-                    </x:Array>
-                </ComboBox.ItemsSource>
-            </ComboBox>
+                      Margin="5,0"
+                      ItemsSource="{Binding AvailableZones}"
+                      SelectedItem="{Binding SelectedZone, Mode=TwoWay}" />
 
             <!-- Vehicle registration -->
             <TextBlock Text="Vehicle:" VerticalAlignment="Center" FontWeight="Bold"/>
@@ -52,7 +41,6 @@
                                     ValidatesOnDataErrors=True}"
                      ToolTip="{Binding (Validation.Errors)[0].ErrorContent, 
                                        RelativeSource={RelativeSource Self}}"/>
-
 
             <!-- Start date -->
             <TextBlock Text="Start Date:" VerticalAlignment="Center" FontWeight="Bold"/>
@@ -79,14 +67,54 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10" >
 
-            <Button Content="Load Active Permits"
-                    Padding="10,5"
-                    Command="{Binding LoadPermitsCommand}" />
+            <Controls:ToggleSwitch
+                    Header="Permit Mode"
+                    OnContent="All"
+                    OffContent="Zone"
+                    IsOn="{Binding ShowAllPermits, Mode=TwoWay}"
+                    Margin="10, 0, 0, 0"
+                    Width="150"
+                    Height="50"
+                    Foreground="Black"/>    
+         
+            <TextBlock Text="Has valid permit"
+                       Foreground="Green"
+                       FontWeight="Bold"
+                       Visibility="{Binding HasValidPermit, Converter={StaticResource BoolToVis}}"
+                       Margin="10,0,0,0"/>
+
+                <TextBlock Text="Does not have permit"
+                       Foreground="Red"
+                       FontWeight="Bold"
+                       Visibility="{Binding NoValidPermit, Converter={StaticResource BoolToVis}}"
+                       Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10" >
+            <TextBlock Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}"
+                       Foreground="Green"
+                       FontWeight="Bold"
+                       Margin="10,0,0,0"
+                       Opacity="0">     
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="{x:Static Binding.TargetUpdatedEvent}">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                     From="1" To="0"
+                                     BeginTime="0:0:0"
+                                     Duration="0:0:2" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
 
             <Button Content="Add Permit"
                     Padding="10,5"
                     Margin="10,0,0,0"
                     Command="{Binding AddPermitCommand}" />
+
         </StackPanel>
 
         <!-- Data grid of permits -->
@@ -98,6 +126,12 @@
                   HeadersVisibility="Column"
                   BorderBrush="#ccc"
                   BorderThickness="1">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Vehicle" Binding="{Binding Vehicle.Registration}" Width="*"/>
                 <DataGridTextColumn Header="Zone" Binding="{Binding Zone.Name}" Width="80"/>

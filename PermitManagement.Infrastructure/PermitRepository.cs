@@ -25,4 +25,9 @@ public class PermitRepository(PermitDbContext context) : IPermitRepository
             .Where(p => p.Zone.Name == zone.Name)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Permit>> GetAllPermitsAsync()
+    {
+        return await context.Permits.ToListAsync();
+    }
 }

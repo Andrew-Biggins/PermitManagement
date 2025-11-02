@@ -1,7 +1,9 @@
 ﻿using PermitManagement.Core.Entities;
 using PermitManagement.Presentation;
 using System.Globalization;
-using static PermitManagement.Presentation.Shared;
+using static PermitManagement.Shared.Constants;
+using static PermitManagement.Shared.ValidationRules;
+using static PermitManagement.Shared.ZoneInfo;
 
 using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7158") };
 var api = new PermitApiClient(http);
@@ -11,7 +13,8 @@ while (true)
     Console.WriteLine("\nPermit Management CLI");
     Console.WriteLine("1. Add Permit");
     Console.WriteLine("2. Check Permit");
-    Console.WriteLine("3. List Active Permits");
+    Console.WriteLine("3. List Active Permits For Zone");
+    Console.WriteLine("4. List All Active Permits");
     Console.WriteLine("0. Exit");
     Console.Write("> ");
     var choice = Console.ReadLine();
@@ -37,11 +40,16 @@ while (true)
             break;
 
         case "3":
-            Console.Write("Zone: ");
             zone = ReadZone();
-            var permits = await api.GetActivePermitsAsync(zone.Name);
-            foreach (var p in permits)
-                Console.WriteLine($"{p.Vehicle.Registration} valid {p.StartDate:d} → {p.EndDate:d}");
+            var zonePermits = await api.GetActivePermitsAsync(zone.Name);
+            foreach (var p in zonePermits)
+                Console.WriteLine($"{p.Vehicle.Registration} valid {p.StartDate:d} - {p.EndDate:d}");
+            break;
+
+        case "4":
+            var allPermits = await api.GetActivePermitsAsync();
+            foreach (var p in allPermits)
+                Console.WriteLine($"{p.Vehicle.Registration} Zone:{p.Zone.Name} valid {p.StartDate:d} - {p.EndDate:d}");
             break;
 
         case "0":
@@ -53,13 +61,12 @@ static DateTime ReadDate(string prompt)
 {
     while (true)
     {
-        const string dateFormat = "yyyy-MM-dd";
-        Console.Write($"{prompt} ({dateFormat}): ");
+        Console.Write($"{prompt} ({DateFormat}): ");
         var input = Console.ReadLine();
 
         if (DateTime.TryParseExact(
                 input,
-                dateFormat,
+                DateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out var date))
@@ -68,7 +75,7 @@ static DateTime ReadDate(string prompt)
         }
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Invalid date format. Please use ({dateFormat}).");
+        Console.WriteLine($"Invalid date format. Please use ({DateFormat}).");
         Console.ResetColor();
     }
 }
@@ -77,14 +84,14 @@ static Zone ReadZone()
 {
     while (true)
     {
-        Console.Write("Zone (A–K): ");
+        Console.Write($"Zone ({RangeDescription()}): ");
         var input = Console.ReadLine()?.Trim().ToUpperInvariant();
 
-        if (!string.IsNullOrEmpty(input) && input.Length == 1 && input[0] is >= 'A' and <= 'K')
+        if (!string.IsNullOrEmpty(input) && IsValid(input))
             return new Zone(input);
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Invalid zone. Enter a single letter from A to K.");
+        Console.WriteLine($"Invalid zone. Enter a letter from {RangeDescription()}.");
         Console.ResetColor();
     }
 }

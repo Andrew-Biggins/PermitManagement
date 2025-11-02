@@ -30,4 +30,11 @@ public class PermitService(IPermitRepository repo, IDateTimeProvider clock) : IP
         var permits = await _repo.GetPermitsByZoneAsync(zone);
         return permits.Where(p => p.IsActive(now));
     }
+
+    public async Task<IEnumerable<Permit>> GetAllActivePermitsAsync(DateTime? date = null)
+    {
+        var now = date ?? _clock.UtcNow;
+        var allPermits = await _repo.GetAllPermitsAsync();
+        return allPermits.Where(p => p.IsActive(now));
+    }
 }

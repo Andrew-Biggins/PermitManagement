@@ -60,10 +60,38 @@ public class PermitRepositoryTests
         Assert.Equal(ZoneA.Name, result.Zone.Name);
     }
 
+    [Gwt("Given multiple permits in different zones",
+    "when retrieving all permits",
+    "then all permits are returned regardless of zone")]
+    public async Task T2()
+    {
+        // Arrange
+        using var context = CreateContext();
+        var repo = new PermitRepository(context);
+
+        var permitA = new Permit(VehicleABC123, ZoneA, DefaultStart, DefaultEnd);
+        var permitB = new Permit(VehicleDEF456, ZoneB, DefaultStart, DefaultEnd);
+        var permitC = new Permit(VehicleGHI789, ZoneC, DefaultStart, DefaultEnd);
+
+        await repo.AddAsync(permitA);
+        await repo.AddAsync(permitB);
+        await repo.AddAsync(permitC);
+
+        // Act
+        var allResults = await repo.GetAllPermitsAsync();
+
+        // Assert
+        var list = allResults.ToList();
+        Assert.Equal(3, list.Count);
+        Assert.Contains(list, p => p.Vehicle.Registration == VehicleABC123.Registration);
+        Assert.Contains(list, p => p.Vehicle.Registration == VehicleDEF456.Registration);
+        Assert.Contains(list, p => p.Vehicle.Registration == VehicleGHI789.Registration);
+    }
+
     [Gwt("Given a permit with vehicle and zone value objects",
         "when persisted and reloaded",
         "then owned properties are correctly mapped")]
-    public async Task T2()
+    public async Task T3()
     {
         // Arrange
         var dbName = Guid.NewGuid().ToString();

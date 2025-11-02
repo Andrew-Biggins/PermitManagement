@@ -68,9 +68,9 @@ public class PermitApiTests
         Assert.NotEmpty(data);
     }
 
-    [Gwt("Given there are active permits for a zone and vehicle",
-        "when permits for the zone and vehicle are requested",
-        "then the permits are returned")]
+    [Gwt("Given a valid permit exists for a vehicle and zone",
+        "when the vehicle is checked in that zone",
+        "then the API returns true")]
     public async Task T2()
     {
         // Arrange
@@ -89,5 +89,39 @@ public class PermitApiTests
 
         // Assert
         Assert.True(result);
+    }
+
+    [Gwt("Given multiple active permits across different zones",
+        "when all active permits are requested without specifying a zone",
+        "then all active permits are returned")]
+    public async Task T3()
+    {
+        // Arrange
+        await _client.PostAsJsonAsync("/permits", new
+        {
+            vehicle = new { registration = "ZNA123" },
+            zone = new { name = "A" },
+            startDate = DateTime.Today.AddDays(-2),
+            endDate = DateTime.Today.AddDays(2)
+        });
+
+        await _client.PostAsJsonAsync("/permits", new
+        {
+            vehicle = new { registration = "ZNB456" },
+            zone = new { name = "B" },
+            startDate = DateTime.Today.AddDays(-1),
+            endDate = DateTime.Today.AddDays(3)
+        });
+
+        // Act
+        var response = await _client.GetAsync("/permits/active");
+        response.EnsureSuccessStatusCode();
+        var data = await response.Content.ReadFromJsonAsync<List<Permit>>();
+
+        // Assert
+        Assert.NotNull(data);
+        Assert.True(data.Count >= 2); // should include both permits
+        Assert.Contains(data, p => p.Vehicle.Registration == "ZNA123");
+        Assert.Contains(data, p => p.Vehicle.Registration == "ZNB456");
     }
 }
